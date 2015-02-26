@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"errors"
 	"github.com/mitchellh/goamz/aws"
-	"github.com/wricardo/goamz/s3"
+	"github.com/mitchellh/goamz/s3"
 	"log"
 	"strings"
 	"sync"
