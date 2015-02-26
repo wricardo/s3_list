@@ -85,6 +85,21 @@ func (this *FilesListRequest) Concurrency(n int) error {
 	return nil
 }
 
+func GetBucket(access_key, secret_key, bucket_name, region_name string) (*s3.Bucket, error){
+	region, ok := aws.Regions[region_name]
+	if !ok {
+		return nil, errors.New("Invalid region name")
+	}
+
+	auth := aws.Auth{
+		AccessKey: access_key,
+		SecretKey: secret_key,
+	}
+
+	client := s3.New(auth, region)
+	return client.Bucket(bucket_name), nil
+}
+
 func (this *FilesListRequest) Run() error {
 	if this.accessKey == "" {
 		return errors.New("Invalid AccessKey")
@@ -92,18 +107,11 @@ func (this *FilesListRequest) Run() error {
 	if this.secretKey == "" {
 		return errors.New("Invalid SecretKey")
 	}
-	region, ok := aws.Regions[this.regionName]
-	if !ok {
-		return errors.New("Invalid region name")
+	var err error
+	this.bucket, err = GetBucket(this.accessKey, this.secretKey, this.bucketName, this.regionName)
+	if err != nil{
+		return err
 	}
-
-	auth := aws.Auth{
-		AccessKey: this.accessKey,
-		SecretKey: this.secretKey,
-	}
-
-	client := s3.New(auth, region)
-	this.bucket = client.Bucket(this.bucketName)
 
 	this.Aux()
 
